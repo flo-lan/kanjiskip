@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "typeRoots": [
+      "./server/@types",
+      "./node_modules/@types"
+    ]  
+  }
+}

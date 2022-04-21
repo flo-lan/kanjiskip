@@ -1,0 +1,12 @@
+FROM node:14-alpine
+
+WORKDIR /app
+
+COPY package.json /app 
+COPY yarn.lock /app
+RUN yarn install 
+
+# change node user to current user
+USER node
+
+CMD [ "sh", "-c", "yarn build:messages && yarn start" ]

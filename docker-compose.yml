@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  kanjiskip.db:
+    image: mysql:8.0.26
+    container_name: kanjiskip.db
+    hostname: kanjiskip.db
+    restart: unless-stopped
+    command:
+      [
+        'mysqld',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci',
+      ]
+    environment:
+      MYSQL_DATABASE: kanjiskip
+      MYSQL_USER: kanjiskip
+      MYSQL_PASSWORD: pleaseChangemeInProduction
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: pleaseChangemeInProductionRoot
+    healthcheck:
+      test: mysqlshow $${MYSQL_DATABASE} -u$${MYSQL_USER} -p$${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 127.0.0.1:3309:3306
+  kanjiskip.node:
+    container_name: kanjiskip.node
+    hostname: kanjiskip.node
+    build:
+      context: .
+      dockerfile: Dockerfile.develop
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - './:/app'
+    links:
+      - kanjiskip.db:database
+    depends_on:
+      kanjiskip.db:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=development
+      - DB_NAME=kanjiskip
+      - DB_USER=kanjiskip
+      - DB_PASSWORD=pleaseChangemeInProduction
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_DIALECT=mysql
+      - DB_LOGGING=true
+      - SERVER_PORT=8085
+      - LOG_LEVEL=debug
+
+volumes:
+  mysql_data:

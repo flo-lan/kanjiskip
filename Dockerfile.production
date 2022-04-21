@@ -1,0 +1,18 @@
+FROM node:14-alpine
+
+WORKDIR /usr/src/app
+
+RUN mkdir /usr/src/app/node_modules
+COPY node.tsconfig.json tsconfig.json babel.config.js .sequelizerc package.json yarn.lock /usr/src/app/
+
+RUN mkdir /usr/src/app/server
+COPY server /usr/src/app/server
+
+RUN mkdir /usr/src/app/src
+COPY src/shared /usr/src/app/src/shared
+
+COPY node_modules /usr/src/app/node_modules
+
+CMD [ "yarn", "start-prod:server" ]
+
+EXPOSE 8085

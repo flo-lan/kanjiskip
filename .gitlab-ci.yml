@@ -1,0 +1,66 @@
+image: node:14-alpine
+
+stages:
+  - build
+  - dockerize
+  - deploy
+
+build:
+  stage: build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules
+  script:
+    - echo "Building deploy package"
+    - yarn install
+    - yarn build
+    - echo "Build successful"
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - build
+  only:
+    - develop
+
+dockerize:
+  stage: dockerize
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t ${CI_REGISTRY_IMAGE}/$CI_COMMIT_REF_SLUG -f Dockerfile.production .
+    - docker push $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules
+    policy: pull
+  dependencies:
+    - build
+  only:
+    - develop
+
+deploy:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apk --update add openssh-client )'
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOY_SSH_PRIVATE_KEY" | base64 -d | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $DEPLOY_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying to server"
+    - echo "set -e" > update.sh
+    - echo "docker-compose -f docker-compose.develop.yml -f docker-compose.develop.override.yml down" >> update.sh
+    - echo "docker-compose -f docker-compose.develop.yml -f docker-compose.develop.override.yml pull" >> update.sh
+    - echo "docker-compose -f docker-compose.develop.yml -f docker-compose.develop.override.yml up -d --remove-orphans" >> update.sh
+    - chmod +x update.sh
+    - echo "IMAGE_TAG=${CI_COMMIT_REF_SLUG}" > .env
+    - scp docker-compose.develop.yml update.sh .env $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_HOST_ROOT/kanjiskip/
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_HOST_ROOT/kanjiskip && ./update.sh"
+  only:
+    - develop
