@@ -3,7 +3,7 @@ FROM node:14-alpine
 WORKDIR /usr/src/app
 
 RUN mkdir /usr/src/app/node_modules
-COPY node.tsconfig.json tsconfig.json babel.config.js .sequelizerc package.json yarn.lock /usr/src/app/
+COPY node.tsconfig.json tsconfig.json babel.config.js .sequelizerc package.json yarn.lock ormconfig.js /usr/src/app/
 
 RUN mkdir /usr/src/app/server
 COPY server /usr/src/app/server

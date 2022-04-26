@@ -1,4 +1,3 @@
-import { GetKanjiPayload } from './../../src/shared/types/KanjiRequestPayload'
 import express, { Router } from 'express'
 import { Service, Inject } from 'typedi'
 import HttpStatus from 'http-status-codes'
@@ -8,6 +7,7 @@ import IEndpoint from './IEndpoint'
 import { logger } from '../utils/Logger'
 import KanjiMapper from '../mapper/KanjiMapper'
 import KanjiService from '../service/KanjiService'
+import { GetKanjiPayload } from '../../src/shared/types/KanjiRequestPayload'
 
 @Service({ id: EndpointToken, multiple: true })
 class KanjiEndpoint implements IEndpoint {

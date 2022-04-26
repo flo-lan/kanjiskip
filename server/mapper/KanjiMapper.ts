@@ -1,5 +1,5 @@
-import KanjiModel from '../database/model/KanjiModel'
 import KanjiDTO from '../../src/shared/types/DTO/KanjiDTO'
+import { KanjiModel } from '../database/entity'
 
 export default {
   toDTO(kanjiDAO: KanjiModel): KanjiDTO {

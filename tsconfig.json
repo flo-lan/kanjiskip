@@ -26,9 +26,17 @@
       "./node_modules/@types"
     ]
   },
+  "ts-node": {
+    "files": true,
+    // these options are overrides used only by ts-node
+    // used for typeorm cli
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "include": [
     "src",
     "server"
   ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
 }
