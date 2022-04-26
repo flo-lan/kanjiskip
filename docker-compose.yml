@@ -47,7 +47,6 @@ services:
       - DB_PASSWORD=pleaseChangemeInProduction
       - DB_HOST=database
       - DB_PORT=3306
-      - DB_DIALECT=mysql
       - DB_LOGGING=true
       - SERVER_PORT=8085
       - LOG_LEVEL=debug

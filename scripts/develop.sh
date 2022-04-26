@@ -8,8 +8,7 @@ docker-compose -f ${COMPOSE} up -d ${SERVICE_DB}
 docker-compose -f ${COMPOSE} run --rm ${SERVICE} yarn install
 
 
-docker-compose -f ${COMPOSE} run --rm ${SERVICE} npx sequelize-cli db:migrate
-docker-compose -f ${COMPOSE} run --rm ${SERVICE} npx sequelize-cli db:seed:all
+docker-compose -f ${COMPOSE} run --rm ${SERVICE} yarn typeorm migration:run
 
 # start
 docker-compose -f ${COMPOSE} up
